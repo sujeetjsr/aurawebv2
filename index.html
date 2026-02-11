@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mega Offer - 20+ Video Bundle</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- Welcome Overlay -->
+    <div id="welcome-overlay">
+        <div class="overlay-content">
+            <h1>🎉 CONGRATULATIONS! 🎉</h1>
+            <p>You Unlocked the <br><span class="offer-highlight">99 Rs OFFER!</span></p>
+            <div class="loader"></div>
+        </div>
+    </div>
+    <script>
+        // CRITICAL FAILSAFE: Force remove overlay if JS fails
+        setTimeout(() => {
+            const overlay = document.getElementById('welcome-overlay');
+            if (overlay) {
+                overlay.style.transition = "opacity 0.5s ease"; // Faster fade
+                overlay.style.opacity = "0";
+                overlay.style.pointerEvents = "none";
+                setTimeout(() => overlay.remove(), 500);
+            }
+        }, 1500); // Reduced to 1.5s
+    </script>
+
+    <header>
+        ⚠️ MEGA BUNDLE APP ⚠️
+    </header>
+
+    <div class="hero">
+        <h1>BUILD YOUR BUNDLE</h1>
+        <p>Choose any <span style="background: yellow; color: red; font-weight: 900; padding: 0 5px;">10 VIDEOS</span>
+            for just ₹99!</p>
+
+        <div class="instruction-box">
+            👇 TAP IMAGES TO SELECT 👇
+        </div>
+    </div>
+
+    <div class="gallery">
+        <!-- Images will be injected here by script.js -->
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Video Bundle Shop. All rights reserved.</p>
+    </footer>
+
+    <!-- Lightbox -->
+    <div id="lightbox" class="lightbox">
+        <img id="lightbox-img" src="" alt="Full view">
+    </div>
+
+    <!-- Sticky App Bar -->
+    <div class="sticky-bar">
+        <div class="progress-bar-container">
+            <div id="progress-fill" class="progress-fill"></div>
+        </div>
+        <div class="selection-info">
+            Selected: <span id="count">0</span>/10
+        </div>
+        <button id="buy-btn" class="buy-btn" onclick="buyNow()">
+            SELECT 10 TO BUY
+        </button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
