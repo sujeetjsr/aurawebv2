@@ -135,6 +135,85 @@ body {
 /* Import Google Font */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap');
 
+/* Contact Header */
+.contact-header {
+    background: #25d366;
+    color: white;
+    text-align: center;
+    padding: 8px;
+    font-weight: bold;
+    display: block;
+    text-decoration: none;
+    font-size: 1.1rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 99;
+    animation: pulse 2s infinite;
+}
+
+.contact-header:hover {
+    background: #128c7e;
+}
+
+/* Pricing Styles */
+.price-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin: 15px 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+.old-price {
+    font-size: 1.5rem;
+    color: #888;
+    text-decoration: line-through;
+    font-weight: bold;
+}
+
+.new-price {
+    font-size: 4rem;
+    color: #e60000;
+    /* Bright Red */
+    font-weight: 900;
+    text-shadow: 2px 2px 0px yellow;
+    animation: popIn 1s infinite alternate;
+}
+
+.discount-badge {
+    background: red;
+    color: yellow;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: 900;
+    transform: rotate(-10deg);
+    box-shadow: 0 0 10px red;
+    animation: shake 2s infinite;
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: rotate(-10deg);
+    }
+
+    50% {
+        transform: rotate(10deg);
+    }
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(1);
+    }
+
+    100% {
+        transform: scale(1.1);
+    }
+}
+
 /* Header */
 header {
     background: linear-gradient(45deg, #ff0000, #ff4500, #ff0000);
@@ -143,14 +222,43 @@ header {
     text-align: center;
     padding: 15px;
     font-weight: 900;
-    font-size: 1.2rem;
+    font-size: 1.4rem;
+    /* Larger */
     text-transform: uppercase;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    animation: gradientShift 3s ease infinite;
-    text-shadow: 2px 2px 0 #000;
+    box-shadow: 0 4px 15px rgba(255, 0, 0, 0.5);
+    animation: gradientShift 2s ease infinite, glitch 3s infinite;
+    /* Faster shift + glitch */
+    text-shadow: 3px 3px 0 #000;
     position: sticky;
     top: 0;
     z-index: 100;
+    border-bottom: 3px solid yellow;
+}
+
+@keyframes glitch {
+    0% {
+        transform: translate(0);
+    }
+
+    20% {
+        transform: translate(-2px, 2px);
+    }
+
+    40% {
+        transform: translate(-2px, -2px);
+    }
+
+    60% {
+        transform: translate(2px, 2px);
+    }
+
+    80% {
+        transform: translate(2px, -2px);
+    }
+
+    100% {
+        transform: translate(0);
+    }
 }
 
 @keyframes gradientShift {
@@ -277,13 +385,36 @@ header {
 
 /* Default State: SELECT (Green) */
 .action-btn.select {
-    background: linear-gradient(45deg, #28a745, #218838);
+    background: linear-gradient(45deg, #28a745, #34ce57);
+    /* Brighter green */
     color: white;
-    box-shadow: 0 -4px 10px rgba(40, 167, 69, 0.2);
+    box-shadow: 0 -4px 10px rgba(40, 167, 69, 0.4);
+    animation: pulseBtn 1.5s infinite;
+    /* Constant attention */
+    border-top: 2px solid #fff;
 }
 
 .action-btn.select:hover {
     background: linear-gradient(45deg, #218838, #1e7e34);
+    transform: scale(1.05);
+    /* Grow on hover */
+}
+
+@keyframes pulseBtn {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+    }
+
+    70% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+    }
 }
 
 /* Selected State: REMOVE (Red) */
