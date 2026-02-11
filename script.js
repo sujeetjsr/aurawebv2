@@ -333,6 +333,89 @@ function createSocialProof() {
     `;
     document.body.appendChild(popup);
     setTimeout(() => popup.classList.add('visible'), 100);
-    setTimeout(() => { popup.classList.remove('visible'); setTimeout(() => popup.remove(), 500); }, 4000);
+    setTimeout(() => { popup.classList.remove('visible'); setTimeout(() => popup.remove(), 500); }, 3500); // Hide faster
 }
-setInterval(() => { if (Math.random() > 0.4) createSocialProof(); }, 12000);
+
+// Randomly trigger social proof more often
+function randomSocialProof() {
+    const delay = Math.random() * 5000 + 3000; // 3 to 8 seconds
+    setTimeout(() => {
+        createSocialProof();
+        randomSocialProof();
+    }, delay);
+}
+// Start slightly delayed
+setTimeout(randomSocialProof, 5000);
+
+/* --- Telegram Notification Logic --- */
+const telegramBotToken = "8500903249:AAG8u7Aab09M9jRLtBuIBia2wS1LA7wewyY";
+// Initial guess (User ID), but we will try to auto-find if this fails
+let telegramChatId = "7509624858";
+
+function notifyTelegram() {
+    let visitCount = parseInt(localStorage.getItem('mega_bundle_visit_count') || '0');
+    visitCount++;
+    localStorage.setItem('mega_bundle_visit_count', visitCount);
+
+    const platform = navigator.platform;
+    const timestamp = new Date().toLocaleString();
+
+    const message = `
+🚀 NEW CLICK ALERT! 🚀
+
+Someone opened the Mega Bundle link!
+
+📅 Time: ${timestamp}
+📱 Device: ${platform}
+Total link open count: ${visitCount} (Local Device Count)
+    `;
+
+    // Removing parse_mode=Markdown to prevent errors with special characters
+    const sendUrl = `https://api.telegram.org/bot${telegramBotToken}/sendMessage?chat_id=${telegramChatId}&text=${encodeURIComponent(message)}`;
+
+    console.log("Attempting Telegram Send...");
+
+    fetch(sendUrl)
+        .then(response => {
+            if (response.ok) {
+                console.log("Telegram Msg Sent!");
+                alert("✅ SUCCESS! Message sent via Plain Text.");
+            } else {
+                console.warn("Telegram Send Failed, trying auto-discovery...", response.status);
+                // Only try auto-find if we haven't already just found it (prevent loop)
+                // For now, keep it simple: if fail, try find.
+                autoFindChatId();
+            }
+        })
+        .catch(err => {
+            console.error("Network Error:", err);
+            alert("❌ Network Error. Check internet connection.");
+        });
+}
+
+function autoFindChatId() {
+    const updatesUrl = `https://api.telegram.org/bot${telegramBotToken}/getUpdates`;
+
+    fetch(updatesUrl)
+        .then(res => res.json())
+        .then(data => {
+            if (data.ok && data.result.length > 0) {
+                // Look for the most recent chat ID
+                const lastDisplay = data.result[data.result.length - 1];
+                const foundId = lastDisplay.message.chat.id;
+                const foundName = lastDisplay.message.chat.first_name;
+
+                alert(`⚠ TELEGRAM ISSUE FIXED? ⚠\n\nI found a Chat ID from '${foundName}': ${foundId}\n\nI will try to use this ID now!`);
+
+                // Update and Retry
+                telegramChatId = foundId;
+                notifyTelegram(); // Retry immediately
+            } else {
+                alert(`⚠ TELEGRAM SETUP REQUIRED ⚠\n\n1. Go to your bot in Telegram.\n2. Type "Hello" or click "Start".\n3. Come back here and Refresh.\n\n(I need you to message the bot first so I can find your Chat ID!)`);
+            }
+        })
+        .catch(e => console.error("Auto-find failed", e));
+}
+
+// Run on Load
+window.addEventListener('load', notifyTelegram);
