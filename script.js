@@ -36,7 +36,7 @@ const images = [
 
 // State
 let selectedIndices = new Set();
-const maxSelection = 10;
+const minSelection = 5; // Reverted to 5 as per request
 const galleryContainer = document.querySelector('.gallery');
 
 // Render Gallery
@@ -126,8 +126,17 @@ function toggleSelection(index, container, btn, imgElement) {
 
     } else {
         // Select
-        if (selectedIndices.size >= maxSelection) {
-            alert("You can only select 10 bundles!");
+        // Allow more than 5? User said "asking for 10 ... instead of 5". 
+        // Let's enforce 5 as the deal size. 
+        if (selectedIndices.size >= minSelection) {
+            // Optional: Allow more but warn? Or hard limit? 
+            // "Select 5 or more" was original copy.
+            // But usually these bundles are fixed size. 
+            // Let's stick to EXACTLY 5 to keep it simple and consistent with "10 Rs / Bundle" offer if that's the math.
+            // Actually, usually users want to buy MORE. 
+            // But the user complained "asking for 10... instead of 5". 
+            // So they want the limit to be 5.
+            alert(`You can only select ${minSelection} bundles for this offer!`);
             return;
         }
 
@@ -206,43 +215,45 @@ function updateUI() {
     const progressBar = document.getElementById('progress-fill');
 
     const count = selectedIndices.size;
-    const progress = (count / maxSelection) * 100;
+    const progress = (count / minSelection) * 100;
 
     countSpan.innerText = count;
     progressBar.style.width = `${progress}%`;
 
-    if (count === maxSelection) {
+    if (count === minSelection) {
         buyBtn.classList.add('active');
-        buyBtn.innerText = "BUY NOW - ₹99";
+        buyBtn.innerText = "BUY NOW - ₹50"; // 5 * 10
         // Celebrate!
         if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
     } else {
         buyBtn.classList.remove('active');
-        buyBtn.innerText = `SELECT ${maxSelection - count} MORE`;
+        buyBtn.innerText = `SELECT ${minSelection - count} MORE`;
     }
 }
 
 // WhatsApp Redirect
+// WhatsApp Redirect
 const whatsappNumber = '919826397716';
 
 function buyNow() {
-    if (selectedIndices.size !== maxSelection) return;
+    if (selectedIndices.size !== minSelection) return;
 
     if (navigator.vibrate) {
         navigator.vibrate(200);
     }
 
     const serials = Array.from(selectedIndices).map(i => i + 1).sort((a, b) => a - b);
-    const serialString = serials.join(', #');
 
-    const message = `Hello! I have selected 10 bundles for the ₹99 offer.\n\nSerial Numbers: #${serialString}\n\nPlease send me the payment link.`;
+    // Save selection to LocalStorage for the next page
+    const orderData = {
+        itemCount: selectedIndices.size,
+        totalPrice: 50, // 5 * 10
+        selectedIds: serials
+    };
+    localStorage.setItem('mega_bundle_order', JSON.stringify(orderData));
 
-    if (whatsappNumber === 'INSERT_NUMBER_HERE') {
-        alert("Please configure the WhatsApp number in script.js!");
-        return;
-    }
-    const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-    window.location.href = url;
+    // Redirect to Details Page
+    window.location.href = 'details.html';
 }
 
 // Misc Logic (Timer, Confetti, etc)
