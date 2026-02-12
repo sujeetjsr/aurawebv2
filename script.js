@@ -268,7 +268,7 @@ initializeClock('timer', deadline);
 
 // Dynamic Title
 window.addEventListener("blur", () => { document.title = "WAIT! Don't Miss Out! 😱"; });
-window.addEventListener("focus", () => { document.title = "Mega Offer - 20+ Video Bundle"; });
+window.addEventListener("focus", () => { document.title = "Mega Offer - 10 Video Bundle"; });
 
 // Handle Welcome Overlay Logic Independently
 document.addEventListener("DOMContentLoaded", () => {
@@ -322,6 +322,7 @@ window.addEventListener('load', startConfetti);
 // Social Proof
 const names = ["Rahul", "Priya", "Amit", "Sneha", "Vikram"];
 const cities = ["Delhi", "Mumbai", "Bangalore", "Pune", "Hyderabad"];
+
 function createSocialProof() {
     const name = names[Math.floor(Math.random() * names.length)];
     const city = cities[Math.floor(Math.random() * cities.length)];
@@ -333,7 +334,10 @@ function createSocialProof() {
     `;
     document.body.appendChild(popup);
     setTimeout(() => popup.classList.add('visible'), 100);
-    setTimeout(() => { popup.classList.remove('visible'); setTimeout(() => popup.remove(), 500); }, 3500); // Hide faster
+    setTimeout(() => {
+        popup.classList.remove('visible');
+        setTimeout(() => popup.remove(), 500);
+    }, 3500); // Hide faster
 }
 
 // Randomly trigger social proof more often
@@ -349,72 +353,53 @@ setTimeout(randomSocialProof, 5000);
 
 /* --- Telegram Notification Logic --- */
 const telegramBotToken = "8500903249:AAG8u7Aab09M9jRLtBuIBia2wS1LA7wewyY";
-// Initial guess (User ID), but we will try to auto-find if this fails
-let telegramChatId = "7509624858";
+const telegramChatId = "7509624858";
 
 function notifyTelegram() {
+    console.log("Attempting to send Telegram notification...");
+
+    // Check if first time
+    const visited = localStorage.getItem('mega_bundle_visit');
     let visitCount = parseInt(localStorage.getItem('mega_bundle_visit_count') || '0');
+
+    // Increment local visit count
     visitCount++;
     localStorage.setItem('mega_bundle_visit_count', visitCount);
 
+    // DEBUG: Force send for now to test connectivity
+    // if (!visited) {
+    // First Time Visit
+    localStorage.setItem('mega_bundle_visit', 'true');
+
+    // Gather Info
     const platform = navigator.platform;
     const timestamp = new Date().toLocaleString();
 
     const message = `
-🚀 NEW CLICK ALERT! 🚀
+🚀 *NEW USER ALERT!* 🚀
 
-Someone opened the Mega Bundle link!
+Someone just opened the Mega Bundle link!
 
-📅 Time: ${timestamp}
-📱 Device: ${platform}
+📅 *Time:* ${timestamp}
+📱 *Device:* ${platform}
 Total link open count: ${visitCount} (Local Device Count)
-    `;
+        `;
 
-    // Removing parse_mode=Markdown to prevent errors with special characters
-    const sendUrl = `https://api.telegram.org/bot${telegramBotToken}/sendMessage?chat_id=${telegramChatId}&text=${encodeURIComponent(message)}`;
+    const url = `https://api.telegram.org/bot${telegramBotToken}/sendMessage?chat_id=${telegramChatId}&text=${encodeURIComponent(message)}&parse_mode=Markdown`;
 
-    console.log("Attempting Telegram Send...");
+    console.log("Sending request to:", url);
 
-    fetch(sendUrl)
+    // Send Request
+    fetch(url)
         .then(response => {
-            if (response.ok) {
-                console.log("Telegram Msg Sent!");
-                alert("✅ SUCCESS! Message sent via Plain Text.");
-            } else {
-                console.warn("Telegram Send Failed, trying auto-discovery...", response.status);
-                // Only try auto-find if we haven't already just found it (prevent loop)
-                // For now, keep it simple: if fail, try find.
-                autoFindChatId();
+            console.log("Telegram Response Status:", response.status);
+            if (!response.ok) {
+                // Try to read error
+                response.text().then(text => console.error("Telegram Error Body:", text));
             }
         })
-        .catch(err => {
-            console.error("Network Error:", err);
-            alert("❌ Network Error. Check internet connection.");
-        });
-}
-
-function autoFindChatId() {
-    const updatesUrl = `https://api.telegram.org/bot${telegramBotToken}/getUpdates`;
-
-    fetch(updatesUrl)
-        .then(res => res.json())
-        .then(data => {
-            if (data.ok && data.result.length > 0) {
-                // Look for the most recent chat ID
-                const lastDisplay = data.result[data.result.length - 1];
-                const foundId = lastDisplay.message.chat.id;
-                const foundName = lastDisplay.message.chat.first_name;
-
-                alert(`⚠ TELEGRAM ISSUE FIXED? ⚠\n\nI found a Chat ID from '${foundName}': ${foundId}\n\nI will try to use this ID now!`);
-
-                // Update and Retry
-                telegramChatId = foundId;
-                notifyTelegram(); // Retry immediately
-            } else {
-                alert(`⚠ TELEGRAM SETUP REQUIRED ⚠\n\n1. Go to your bot in Telegram.\n2. Type "Hello" or click "Start".\n3. Come back here and Refresh.\n\n(I need you to message the bot first so I can find your Chat ID!)`);
-            }
-        })
-        .catch(e => console.error("Auto-find failed", e));
+        .catch(err => console.error("Telegram Fetch Error:", err));
+    // }
 }
 
 // Run on Load
