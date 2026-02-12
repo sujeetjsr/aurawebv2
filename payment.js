@@ -22,13 +22,27 @@ document.getElementById('user-name-display').innerText = userData.name;
 
 
 // Handle File Input Change
+// Handle File Input Change
 const fileInput = document.getElementById('screenshot-upload');
 const fileNameDisplay = document.getElementById('file-name-display');
+const finishBtn = document.getElementById('finish-btn');
+
+// Disable button initially
+finishBtn.disabled = true;
+finishBtn.style.opacity = "0.5";
+finishBtn.style.cursor = "not-allowed";
+finishBtn.title = "Please upload screenshot first";
 
 fileInput.addEventListener('change', () => {
     if (fileInput.files.length > 0) {
         fileNameDisplay.textContent = `Selected: ${fileInput.files[0].name}`;
         fileNameDisplay.style.display = 'block';
+
+        // Enable Button
+        finishBtn.disabled = false;
+        finishBtn.style.opacity = "1";
+        finishBtn.style.cursor = "pointer";
+        finishBtn.innerText = "PAYMENT DONE ✅ (Click to Submit)";
     }
 });
 
