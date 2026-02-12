@@ -623,10 +623,14 @@ header {
 }
 
 .lightbox img {
-    max-width: 90%;
-    max-height: 90%;
+    max-width: 90vw;
+    max-height: 90vh;
     border-radius: var(--radius-lg);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    margin: auto;
+    /* Critical for centering */
+    display: block;
+    object-fit: contain;
 }
 
 /* Social Proof Popup */
