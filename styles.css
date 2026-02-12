@@ -681,6 +681,87 @@ header {
     transition: transform 0.3s;
 }
 
-.logos i:hover {
-    transform: scale(1.2);
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+    .gallery {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 15px !important;
+        padding: 0 15px !important;
+    }
+
+    .hero h1 {
+        font-size: 1.8rem;
+    }
+
+    .platform-logos i {
+        font-size: 2rem;
+    }
+
+    .selling-points {
+        gap: 10px;
+    }
+
+    .point {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+}
+
+/* Dynamic Welcome Overlay Enhanced */
+.overlay-content {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    transform: scale(0.8);
+    opacity: 0;
+    animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes popIn {
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.overlay-content h1 {
+    color: var(--primary-blue);
+    font-size: 2.2rem;
+    margin-bottom: 5px;
+}
+
+.overlay-content p {
+    font-size: 1.2rem;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.offer-highlight {
+    color: #e11d48;
+    font-weight: 800;
+    font-size: 1.5rem;
+    display: block;
+    margin-top: 5px;
+    text-transform: uppercase;
+    animation: textGlitch 2s infinite;
+}
+
+@keyframes textGlitch {
+
+    0%,
+    100% {
+        transform: skew(0deg);
+    }
+
+    20% {
+        transform: skew(-10deg);
+        color: #ff0000;
+    }
+
+    40% {
+        transform: skew(10deg);
+        color: #e11d48;
+    }
 }
