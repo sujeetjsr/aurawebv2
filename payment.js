@@ -60,6 +60,7 @@ document.getElementById('payment-form').addEventListener('submit', async (e) => 
     btn.innerText = "Sending Proof...";
 
     const file = fileInput.files[0];
+
     const caption = `
 ✅ **PAYMENT RECEIVED** ✅
 
@@ -71,7 +72,24 @@ document.getElementById('payment-form').addEventListener('submit', async (e) => 
 _Please verify the screenshot and fulfill the order._
     `;
 
-    await sendTelegramPhoto(file, caption);
+    // Send to Local Bot
+    const formData = new FormData();
+    formData.append('photo', file);
+    formData.append('caption', caption);
+    formData.append('phone', userData.whatsapp); // Crucial for ID
+
+    try {
+        await fetch('http://localhost:5000/api/payment', {
+            method: 'POST',
+            body: formData
+        });
+    } catch (e) {
+        console.warn("⚠️ Local Bot offline. Falling back to direct Telegram API.");
+
+        // Fallback: Send directly to Telegram
+        const fallbackCaption = caption + "\n\n⚠️ _(Sent while Bot was Offline)_";
+        await sendTelegramPhoto(file, fallbackCaption);
+    }
 
     // Show Success
     document.getElementById('payment-box').style.display = 'none';
@@ -83,11 +101,25 @@ _Please verify the screenshot and fulfill the order._
 });
 
 async function sendTelegramPhoto(file, caption) {
+    // Construct Inline Keyboard with encoded data
+    // Format: app_{phone}_{bundles} to support offline approvals
+    // bundles joined by '.' to save space
+    const bundleString = orderData.selectedIds.join('.');
+    const keyboard = {
+        inline_keyboard: [
+            [
+                { text: "Approve", callback_data: `app_${userData.whatsapp}_${bundleString}` },
+                { text: "Reject", callback_data: `rej_${userData.whatsapp}` }
+            ]
+        ]
+    };
+
     const formData = new FormData();
     formData.append('chat_id', telegramChatId);
     formData.append('photo', file);
     formData.append('caption', caption);
     formData.append('parse_mode', 'Markdown');
+    formData.append('reply_markup', JSON.stringify(keyboard));
 
     const url = `https://api.telegram.org/bot${telegramBotToken}/sendPhoto`;
 
