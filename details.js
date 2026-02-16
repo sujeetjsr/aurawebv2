@@ -38,9 +38,29 @@ document.getElementById('details-form').addEventListener('submit', async (e) => 
     btn.disabled = true;
     btn.innerText = "Processing...";
 
-    // Send "Pending Payment" Notification to Telegram
-    const message = `
-⏳ **NEW PENDING ORDER** ⏳
+
+    // Send "Pending Payment" Notification to Local Bot (which handles TG and WhatsApp)
+    const payload = {
+        name: name,
+        whatsapp: whatsapp,
+        email: email,
+        itemCount: orderData.itemCount,
+        bundles: orderData.selectedIds,
+        amount: orderData.totalPrice
+    };
+
+    try {
+        await fetch('http://localhost:5000/api/order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+    } catch (e) {
+        console.warn("⚠️ Local Bot offline. Falling back to direct Telegram API.");
+
+        // Fallback: Send directly to Telegram
+        const fallbackMsg = `
+⏳ **NEW PENDING ORDER (OFFLINE MODE)** ⏳
 
 👤 **Name:** ${name}
 📞 **WhatsApp:** ${whatsapp}
@@ -50,10 +70,11 @@ document.getElementById('details-form').addEventListener('submit', async (e) => 
 🆔 **IDs:** ${orderData.selectedIds.join(', ')}
 💰 **Amount:** ₹${orderData.totalPrice}
 
-_Waiting for payment screenshot..._
-    `;
+_Bot is offline. Please verify payment manually._
+        `;
 
-    await sendTelegramMessage(message);
+        await sendTelegramMessage(fallbackMsg);
+    }
 
     // Redirect
     window.location.href = 'payment.html';
